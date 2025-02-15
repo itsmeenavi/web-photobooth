@@ -90,7 +90,7 @@ export default function PhotoBoothPage() {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>Modern Photo Booth</h1>
+      <h1 className={styles.title}>Charlie Booth</h1>
       
       <div className={styles.webcamContainer}>
         <Webcam
