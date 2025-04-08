@@ -6,15 +6,21 @@ import html2canvas from 'html2canvas';
 import styles from './page.module.css';
 
 const frames = [
-  { name: 'Minimal', style: '2px solid rgba(255, 255, 255, 0.8)' },
-  { name: 'Elegant', style: '4px double rgba(180, 180, 180, 0.8)' },
-  { name: 'Modern', style: '4px solid rgba(0, 0, 0, 0.2)' },
+  { name: 'None', style: 'none' },
+  { name: 'Thin White', style: '4px solid white' },
+  { name: 'Thick White', style: '10px solid white' },
+  { name: 'Thin Black', style: '4px solid black' },
+  { name: 'Classic Gray', style: '8px solid #f0f0f0' },
+  { name: 'Shadow', style: 'box-shadow: 3px 3px 5px rgba(0,0,0,0.3)' },
 ];
 
-const backgrounds = [
-  { name: 'None', url: '' },
-  { name: 'Floral', url: '/floral.jpg' },
-  { name: 'Abstract', url: '/abstract.jpg' },
+const filters = [
+  { name: 'Normal', style: 'none' },
+  { name: 'Classic B&W', style: 'grayscale(100%) contrast(1.1)' },
+  { name: 'Vintage Sepia', style: 'sepia(0.6) contrast(1.1) brightness(0.9)' },
+  { name: 'Soft Focus', style: 'blur(1px) brightness(1.05)' },
+  { name: 'High Contrast', style: 'contrast(1.5) saturate(1.1)' },
+  { name: 'Faded', style: 'opacity(0.8) contrast(0.9)' },
 ];
 
 export default function PhotoBoothPage() {
@@ -22,7 +28,7 @@ export default function PhotoBoothPage() {
   const collageRef = useRef<HTMLDivElement>(null);
   const [photos, setPhotos] = useState<string[]>([]);
   const [selectedFrame, setSelectedFrame] = useState(frames[0].style);
-  const [selectedBackground, setSelectedBackground] = useState(backgrounds[0]);
+  const [selectedFilter, setSelectedFilter] = useState(filters[0].style);
   const [isCapturing, setIsCapturing] = useState(false);
   const [countdown, setCountdown] = useState(0);
   const shutterSound = useRef<HTMLAudioElement | null>(null);
@@ -80,8 +86,12 @@ export default function PhotoBoothPage() {
 
   const handleDownload = async () => {
     if (!collageRef.current) return;
-    const canvas = await html2canvas(collageRef.current, { useCORS: true });
-    const dataUrl = canvas.toDataURL('image/png');
+    const canvas = await html2canvas(collageRef.current, {
+      useCORS: true,
+      scale: 2, // Higher quality
+      logging: false,
+    });
+    const dataUrl = canvas.toDataURL('image/png', 1.0);
     const link = document.createElement('a');
     link.href = dataUrl;
     link.download = 'photocard.png';
@@ -144,16 +154,16 @@ export default function PhotoBoothPage() {
             ))}
           </div>
           <div className={styles.selectorGroup}>
-            <span>Background:</span>
-            {backgrounds.map((bg) => (
+            <span>Filter:</span>
+            {filters.map((filter) => (
               <button
-                key={bg.name}
-                onClick={() => setSelectedBackground(bg)}
+                key={filter.name}
+                onClick={() => setSelectedFilter(filter.style)}
                 className={`${styles.selectorButton} ${
-                  selectedBackground.name === bg.name ? styles.activeSelector : ''
+                  selectedFilter === filter.style ? styles.activeSelector : ''
                 }`}
               >
-                {bg.name}
+                {filter.name}
               </button>
             ))}
           </div>
@@ -163,27 +173,26 @@ export default function PhotoBoothPage() {
       <div
         className={styles.collage}
         ref={collageRef}
-        style={
-          selectedBackground.url
-            ? {
-                backgroundImage: `url(${selectedBackground.url})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-              }
-            : { background: '#fff' }
-        }
+        style={{ background: '#fff' }}
       >
+        <div className={styles.photostripBranding}>Charlie Booth</div>
         {Array.from({ length: 6 }).map((_, index) => (
-          <div 
+          <div
             key={index}
             className={styles.photoFrame}
-            style={{ border: photos[index] ? selectedFrame : 'none' }}
+            style={
+              selectedFrame === 'none' ? {} :
+              selectedFrame.includes('box-shadow') ?
+              { boxShadow: selectedFrame.split(': ')[1], border: 'none' } :
+              { border: selectedFrame }
+            }
           >
             {photos[index] && (
               <img 
                 src={photos[index]} 
                 alt={`Photo ${index + 1}`} 
                 className={styles.photo}
+                style={{ filter: selectedFilter }}
               />
             )}
           </div>
