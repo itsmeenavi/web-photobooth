@@ -42,6 +42,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transform: scaleX(-1); /* Mirror the webcam feed */
 }
 
 .countdownOverlay {
@@ -163,6 +164,15 @@
   cursor: pointer;
   transition: all 0.3s ease;
   font-weight: 500;
+  display: inline-flex; /* Align items in buttons */
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.colorButton {
+  min-width: 80px;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.1);
 }
 
 .selectorButton:hover {
@@ -177,6 +187,7 @@
 }
 
 .collage {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   grid-template-rows: auto repeat(3, auto);
@@ -185,7 +196,6 @@
   max-width: 350px;
   margin: 2rem auto;
   padding: 15px;
-  background: #fff;
   border-radius: 5px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
@@ -204,8 +214,6 @@
 
 .photoFrame {
   position: relative;
-  /* aspect-ratio: 1 / 1; */ /* Removed fixed aspect ratio */
-  background: #eee;
   box-shadow: none;
   border-radius: 3px;
   overflow: hidden;
@@ -222,9 +230,9 @@
 
 .photo {
   width: 100%;
-  /* height: 100%; */ /* Let height be determined by width and aspect ratio */
   height: auto;
-  object-fit: cover; /* Still cover, but frame will have correct ratio */
+  object-fit: cover;
   display: block;
   transition: filter 0.3s ease;
+  transform: scaleX(-1); /* Mirror the captured photo */
 }

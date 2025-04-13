@@ -5,13 +5,14 @@ import Webcam from 'react-webcam';
 import html2canvas from 'html2canvas';
 import styles from './page.module.css';
 
-const frames = [
-  { name: 'None', style: 'none' },
-  { name: 'Thin White', style: '4px solid white' },
-  { name: 'Thick White', style: '10px solid white' },
-  { name: 'Thin Black', style: '4px solid black' },
-  { name: 'Classic Gray', style: '8px solid #f0f0f0' },
-  { name: 'Shadow', style: 'box-shadow: 3px 3px 5px rgba(0,0,0,0.3)' },
+// Updated to frame colors
+const frameColors = [
+  { name: 'White', color: '#ffffff' },
+  { name: 'Black', color: '#000000' },
+  { name: 'Gray', color: '#cccccc' },
+  { name: 'Pink', color: '#ffc0cb' },
+  { name: 'Blue', color: '#add8e6' },
+  { name: 'Cream', color: '#f5f5dc' },
 ];
 
 const filters = [
@@ -27,7 +28,7 @@ export default function PhotoBoothPage() {
   const webcamRef = useRef<Webcam>(null);
   const collageRef = useRef<HTMLDivElement>(null);
   const [photos, setPhotos] = useState<string[]>([]);
-  const [selectedFrame, setSelectedFrame] = useState(frames[0].style);
+  const [selectedFrameColor, setSelectedFrameColor] = useState(frameColors[0].color); // Updated state
   const [selectedFilter, setSelectedFilter] = useState(filters[0].style);
   const [isCapturing, setIsCapturing] = useState(false);
   const [countdown, setCountdown] = useState(0);
@@ -108,6 +109,7 @@ export default function PhotoBoothPage() {
           ref={webcamRef}
           screenshotFormat="image/jpeg"
           className={styles.webcam}
+          mirrored={true} // Make webcam view mirrored
         />
         {(isCapturing || countdown > 0) && (
           <div className={styles.countdownOverlay}>
@@ -140,14 +142,16 @@ export default function PhotoBoothPage() {
         )}
         <div className={styles.selectorContainer}>
           <div className={styles.selectorGroup}>
-            <span>Frame Style:</span>
-            {frames.map((frame) => (
+            {/* Updated Frame Selector to Frame Color Selector */}
+            <span>Frame Color:</span>
+            {frameColors.map((frame) => (
               <button
                 key={frame.name}
-                onClick={() => setSelectedFrame(frame.style)}
-                className={`${styles.selectorButton} ${
-                  selectedFrame === frame.style ? styles.activeSelector : ''
+                onClick={() => setSelectedFrameColor(frame.color)}
+                className={`${styles.selectorButton} ${styles.colorButton} ${
+                  selectedFrameColor === frame.color ? styles.activeSelector : ''
                 }`}
+                style={{ backgroundColor: frame.color, color: frame.color === '#000000' || frame.color === '#ffffff' ? (frame.color === '#000000' ? 'white' : 'black') : frame.color }}
               >
                 {frame.name}
               </button>
@@ -173,25 +177,20 @@ export default function PhotoBoothPage() {
       <div
         className={styles.collage}
         ref={collageRef}
-        style={{ background: '#fff' }}
+        style={{ background: selectedFrameColor }}
       >
         <div className={styles.photostripBranding}>Charlie Booth</div>
         {Array.from({ length: 6 }).map((_, index) => (
           <div
             key={index}
             className={styles.photoFrame}
-            style={
-              selectedFrame === 'none' ? {} :
-              selectedFrame.includes('box-shadow') ?
-              { boxShadow: selectedFrame.split(': ')[1], border: 'none' } :
-              { border: selectedFrame }
-            }
+            style={{}}
           >
             {photos[index] && (
-              <img 
-                src={photos[index]} 
-                alt={`Photo ${index + 1}`} 
-                className={styles.photo}
+              <img
+                src={photos[index]}
+                alt={`Photo ${index + 1}`}
+                className={styles.photo} // Keep photo class for mirroring
                 style={{ filter: selectedFilter }}
               />
             )}
