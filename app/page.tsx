@@ -179,7 +179,7 @@ export default function PhotoBoothPage() {
         ref={collageRef}
         style={{ background: selectedFrameColor }}
       >
-        <div className={styles.photostripBranding}>Charlie Booth</div>
+        <div className={styles.photostripBranding}>Photobooth</div>
         {Array.from({ length: 6 }).map((_, index) => (
           <div
             key={index}
